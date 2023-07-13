@@ -23,7 +23,6 @@
 
     <script>
         
-		const fetchURL = 'https://mintnite.io/api/v1/verify?';
         var globalAccount;
 
         window.onload = function () {
@@ -71,7 +70,7 @@
                     console.log('Signature : ' + sign);
                     signature = sign;
 					
-					fetch(fetchURL + new URLSearchParams({
+					fetch(verifyURL + new URLSearchParams({
 						wallet_address: globalAccount,
 						wallet_signature: signature,
 						message: message

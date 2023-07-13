@@ -11,7 +11,9 @@
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 		
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
+	<script src="js/env.js"></script>
+	
+	
     <style>
 		.qr-code img {
 			border: 10px solid white;
@@ -35,16 +37,14 @@
 	
 	<script>
 		
-		const walletURLPrefix  = "https://metamask.app.link/dapp/https://verify.mintnite.io/sign.html";
-		const fetchURL = "https://mintnite.io/api/v1/is-verified?";
-		
 		window.addEventListener("load", () => {
 			var message = uuidv4();
 			console.log("Message: " + message);
+			document.getElementById("url").value = signURL + "?message=" + encodeURIComponent(message);
 			var qrc = new QRCode(document.getElementById("qrcode"), {
 				text: walletURLPrefix + "?message=" + encodeURIComponent(message),
-				width: 384,
-				height: 384,
+				width: 256,
+				height: 256,
 				correctLevel: QRCode.CorrectLevel.H
 			});
 			checkVerification(message);
@@ -56,24 +56,22 @@
 			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
 		  );
 		}
-		
-		function refreshPage() {
-			location.reload();
-		}
 
 		async function checkVerification(message) {
 			
 			if(typeof(EventSource) !== "undefined") {
 			
-				var source = new EventSource(fetchURL + new URLSearchParams({
+				var source = new EventSource(fetchURL + "?" + new URLSearchParams({
 					message: message}));
 					
 					source.addEventListener('message', function(e) {
 						var data = JSON.parse(e.data);
 						console.log(data);
 						
+						console.log("wallet: " + data.wallet_address);
+						
 						if (data.is_verified == 'yes' ) {
-							document.getElementById("verification-result").innerHTML = 'The wallet holder is the owner of the wallet address';
+							document.getElementById("verification-result").innerHTML = 'The ownership of wallet <strong>' + data.wallet_address + '</strong> is verified';
 							openModal();
 							source.close();	// Stop checking
 						}
@@ -85,6 +83,31 @@
 				openModal();
 			}
 		
+		}
+		
+		function refreshPage() {
+			location.reload();
+		}
+		
+		function copyLink() {
+		
+		  // Get the text field
+		  var copyText = document.getElementById("url");
+		  
+		  copyText.type = 'text';
+
+		  // Select the text field
+		  copyText.select();
+		  copyText.setSelectionRange(0, 99999); // For mobile devices
+
+		   // Copy the text inside the text field
+		  navigator.clipboard.writeText(copyText.value);
+		  
+		  /* Change the input's type back to hidden */
+		  copyText.type = 'hidden';
+
+		  // Alert the copied text
+		  alert("Copied! Now, paste the link on a browser with MetaMask wallet installed.");
 		}
 
 	</script>
@@ -107,18 +130,36 @@
 </head>
 
 <body>
-    <div class="container">
+	<div class="container px-4">
+		<div class="row">
+			<div class="alert alert-primary text-center mt-3">
+				<h3 class="alert-heading">Verify Ownership of Wallet</h3>
+			</div>
+		</div>
+	</div>
+    <div class="container px-4">
         <br>
         <div class="row border border-secondary rounded bg-light">
-            <div class="col-1">
-            </div>
-            <div class="col-10">
-                <div class="alert alert-primary text-center mt-3">
-                    <h5 class="alert-heading">Scan The QR Code With MetaMask Wallet</h5>
+			<div class="col-md mt-3">
+				<div class="qr-code mb-3" id="qrcode"></div>
+				<input type="hidden" id="url" value="" >
+			</div>
+            <div class="col-md mt-3">
+                <div class="text-center mt-3">
+                    <h4>How To Use</h4>
                 </div>
-				
-				<div class="qr-code" id="qrcode"></div>
+				<div class="mt-4">
+				</div>
+				<div>
+					<ul>
+						<li>Scan the QR code with <a href="https://metamask.io" target="_blank" title="MetaMask" alt="MetaMask">MetaMask</a> mobile wallet</a>, or
+						<li>Click on the <strong>"Copy Link"</strong> button below and open the link in a browser with MetaMask extension.
+					</ul>
+				</div>
 				<br>
+				<div class="text-center mb-3">
+					<button type="button" id="copy-link" onclick="copyLink();" class="btn btn-primary btn-lg btn-block">Copy Link</button>
+				</div>
 				<div class="text-center mb-3">
 					<button type="button" id="refresh" onclick="refreshPage();" class="btn btn-primary btn-lg btn-block">Start Again</button>
 				</div>
@@ -131,14 +172,14 @@
 		<div class="modal-dialog" role="document">
 		  <div class="modal-content">
 			<div class="modal-header">
-			  <h5 class="modal-title" id="verification-result-modal-label">Wallet is Verified!</h5>
+			  <h5 class="modal-title" id="verification-result-modal-label">Wallet Verification Successful!</h5>
 			</div>
 			<div class="modal-body">
-				<span id="verification-result"></span>
+				<span id="verification-result" style="word-wrap: break-word;"></span>
 			</div>
 			<div class="modal-footer">
 			  <button type="button" id="verification-result-close-btn" class="btn btn-secondary btn-lg" onclick="closeModal()" data-dismiss="modal">Close</button>
-			  <button type="button" class="btn btn-primary btn-lg" onclick="refreshPage();">Verify Again</button>
+			  <button type="button" class="btn btn-primary btn-lg" onclick="refreshPage();">Start Again</button>
 			</div>
 		  </div>
 		</div>

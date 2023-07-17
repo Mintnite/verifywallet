@@ -33,13 +33,24 @@
             white-space: -o-pre-wrap;
             word-wrap: break-word;
         }
+		
+		.msg {
+			color: darkorange;
+			min-height: 48px;
+		}
     </style>
 	
 	<script>
 		
 		window.addEventListener("load", () => {
+		
+			// Clear any existing modal messages
+			document.getElementById("copy-msg").innerHTML = '';
+			document.getElementById("copy-modal-msg").innerHTML = '';
+			
 			var message = uuidv4();
 			console.log("Message: " + message);
+			
 			document.getElementById("url").value = signURL + "?message=" + encodeURIComponent(message);
 			var qrc = new QRCode(document.getElementById("qrcode"), {
 				text: walletURLPrefix + "?message=" + encodeURIComponent(message),
@@ -106,9 +117,10 @@
 		  
 		  /* Change the input's type back to hidden */
 		  copyText.type = 'hidden';
-
+		  
 		  // Alert the copied text
-		  alert("Copied! Now, paste the link on a browser with MetaMask wallet installed.");
+		  document.getElementById("copy-msg").innerHTML = "Copied! Paste the link on a browser with MetaMask wallet installed.";
+
 		}
 		
 		function copyWallet() {
@@ -129,7 +141,7 @@
 		  copyText.type = 'hidden';
 
 		  // Alert the copied text
-		  alert("Copied!");
+		  document.getElementById("copy-modal-msg").innerHTML = "Copied!";
 		}
 
 	</script>
@@ -178,7 +190,7 @@
 						<li>Click on the <strong>"Copy Link"</strong> button below and open the link in a browser with MetaMask extension.
 					</ul>
 				</div>
-				<br>
+				<div class="text-center mb-3 msg" id="copy-msg">&nbsp;</div>
 				<div class="text-center mb-3">
 					<button type="button" id="copy-link" onclick="copyLink();" class="btn btn-primary btn-lg btn-block">Copy Link</button>
 				</div>
@@ -198,6 +210,7 @@
 			</div>
 			<div class="modal-body">
 				<span id="verification-result" style="word-wrap: break-word;"></span>
+				<div class="text-center msg" id="copy-modal-msg"></div>
 				<input type="hidden" id="verified-wallet" name="verified_wallet" value="" >
 			</div>
 			<div class="modal-footer">

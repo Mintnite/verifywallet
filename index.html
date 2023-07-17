@@ -72,6 +72,7 @@
 						
 						if (data.is_verified == 'yes' ) {
 							document.getElementById("verification-result").innerHTML = 'The ownership of wallet <strong>' + data.wallet_address + '</strong> is verified';
+							document.getElementById("verified-wallet").value = data.wallet_address;
 							openModal();
 							source.close();	// Stop checking
 						}
@@ -109,6 +110,27 @@
 		  // Alert the copied text
 		  alert("Copied! Now, paste the link on a browser with MetaMask wallet installed.");
 		}
+		
+		function copyWallet() {
+		
+		  // Get the text field
+		  var copyText = document.getElementById("verified-wallet");
+		  
+		  copyText.type = 'text';
+
+		  // Select the text field
+		  copyText.select();
+		  copyText.setSelectionRange(0, 99999); // For mobile devices
+
+		   // Copy the text inside the text field
+		  navigator.clipboard.writeText(copyText.value);
+		  
+		  /* Change the input's type back to hidden */
+		  copyText.type = 'hidden';
+
+		  // Alert the copied text
+		  alert("Copied!");
+		}
 
 	</script>
 	
@@ -142,7 +164,7 @@
         <div class="row border border-secondary rounded bg-light">
 			<div class="col-md mt-3">
 				<div class="qr-code mb-3" id="qrcode"></div>
-				<input type="hidden" id="url" value="" >
+				<input type="hidden" id="url" name="url" value="" >
 			</div>
             <div class="col-md mt-3">
                 <div class="text-center mt-3">
@@ -176,9 +198,11 @@
 			</div>
 			<div class="modal-body">
 				<span id="verification-result" style="word-wrap: break-word;"></span>
+				<input type="hidden" id="verified-wallet" name="verified_wallet" value="" >
 			</div>
 			<div class="modal-footer">
 			  <button type="button" id="verification-result-close-btn" class="btn btn-secondary btn-lg" onclick="closeModal()" data-dismiss="modal">Close</button>
+			  <button type="button" class="btn btn-primary btn-lg" onclick="copyWallet();">Copy Address</button>
 			  <button type="button" class="btn btn-primary btn-lg" onclick="refreshPage();">Start Again</button>
 			</div>
 		  </div>
